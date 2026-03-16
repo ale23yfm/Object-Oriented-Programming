@@ -173,6 +173,7 @@ int main(int argc, char** argv)
 		else if (o == '9')
 		{
 			printf("Goodbye!\n");
+			destroyRepo(pharmacy);
 			return 0;
 		}
 	}

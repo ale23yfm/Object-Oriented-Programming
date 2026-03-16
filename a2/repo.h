@@ -13,3 +13,4 @@ void updateMedicineFromRepo(repo* r, char* name, int con, int price);
 repo *searchForMedicinePartialName(repo* r, char *word);
 repo *searchForMedicineFullName(repo* r, char *word);
 void printMedicines(repo *r);
+void destroyRepo(repo* r);

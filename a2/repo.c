@@ -16,7 +16,7 @@ repo *repoInit()
 int addMedicineToRepo(repo *r, medicine *m)
 {
 	for (int i = 0; i < r->count; i++)
-		if ((strcmp(r->items[i]->name, m->name) == 0) && (r->items[i]->concentration == m->concentration) && (r->items[i]->price == m->price))
+		if ((strcmp(r->items[i]->name, m->name) == 0) && (r->items[i]->concentration == m->concentration))
 		{
 			r->items[i]->quantity += m->quantity;
 			deleteMedicine(m);
@@ -41,7 +41,7 @@ void deleteMedicineFromRepo(repo *r, char *name, int con)
 			i = r->count;
 		}
 
-	if (index != -1);
+	if (index != -1)
 	{
 		deleteMedicine(r->items[index]);
 		for (int i = index; i < r->count-1; i++)
@@ -90,4 +90,13 @@ void printMedicines(repo* r)
 		if (m)
 			printf("Name: %s | Concentration: %d | Quantity: %d | Price: %d\n", m->name, m->concentration, m->quantity, m->price);
 	}
+}
+
+void destroyRepo(repo* r)
+{
+	if (r == NULL)
+		return;
+	for (int i = 0; i < r->count; i++)
+		deleteMedicine(r->items[i]);
+	free(r);
 }
