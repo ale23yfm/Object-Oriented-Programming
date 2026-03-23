@@ -30,8 +30,9 @@ void printMenu()
 	printf("7. Redo.\n");
 	printf("8. Search for a medicine by partial name (extra).\n");
 	printf("9. Search for a medicine by price (bonus b).\n");
-	printf("10. Print the data base.\n");
-	printf("11. Exit.\n");
+	printf("10. Search for a medicine by partial name, sorted descending by concentration (extra).\n");
+	printf("11. Print the data base.\n");
+	printf("12. Exit.\n");
 }
 
 //1
@@ -121,7 +122,8 @@ void uiSearchFullName(UI* ui)
 
 	printf("You chose to search a medicine by full name. You have to type: \n");
 	printf("name: \n");
-	scanf_s(" %[^\n]", name, (unsigned)_countof(name));
+	fgets(name, sizeof(name), stdin);
+	name[strcspn(name, "\n")] = 0;
 
 	DynamicArray *res = servFullNameSearch(ui->serv, name);
 
@@ -159,7 +161,16 @@ void uiInShortSearch(UI* ui)
 	printf("quantity: ");
 	scanf_s("%d", &givenQty);
 
-	DynamicArray *res = servInShortQty(ui->serv, givenQty, sort);
+	DynamicArray* res;
+
+	if (sort == 1)
+	{
+		res = servInShortQty(ui->serv, givenQty, cmpAscQty);
+	}
+	else
+	{
+		res = servInShortQty(ui->serv, givenQty, cmpDescQty);
+	}
 
 	if (getLength(res) == 0)
 	{
@@ -251,7 +262,39 @@ void uiSearchByPrice(UI* ui)
 	printf("price: ");
 	scanf_s("%d", &price);
 
-	DynamicArray* res = servSearchByPrice(ui->serv, price);
+	DynamicArray* res = servSearchByPrice(ui->serv, price, cmpAscConc);
+
+	if (getLength(res) == 0)
+	{
+		printf("\nNo medicine found! Look there at the entire data base:\n");
+		listAllMed(ui);
+		destroy(res);
+		return;
+	}
+
+	for (int i = 0; i < getLength(res); i++)
+	{
+		Medicine* m = (Medicine*)get(res, i);
+		char buffer[200];
+		toString(m, buffer, 200);
+		printf("%s\n", buffer);
+	}
+
+	destroy(res);
+}
+
+//10
+void uiSearchPartialNameSortConc(UI* ui)
+{
+	char name[50];
+
+	printf("You chose to search a medicine by partial name. You have to type: \n");
+	printf("name: \n");
+
+	fgets(name, sizeof(name), stdin);
+	name[strcspn(name, "\n")] = 0;
+
+	DynamicArray* res = servPartialNameSearchSortConc(ui->serv, name);
 
 	if (getLength(res) == 0)
 	{
@@ -288,11 +331,15 @@ void startUI(UI *ui)
 {
 	int cmd = -1;
 	printf("Hi, John! Here is your Smiles Pharmacy stock =)!\n");
-	while (cmd != 11)
+	while (cmd != 12)
 	{
 		printMenu();
 		printf("Your option:");
 		scanf_s("%d", &cmd);
+
+		int c;
+		while ((c = getchar()) != '\n' && c != EOF) {}
+
 		switch (cmd)
 		{
 		case 1:
@@ -323,9 +370,12 @@ void startUI(UI *ui)
 			uiSearchByPrice(ui);
 			break;
 		case 10:
-			listAllMed(ui);
+			uiSearchPartialNameSortConc(ui);
 			break;
 		case 11:
+			listAllMed(ui);
+			break;
+		case 12:
 			printf("\nGoodbye, Johnny!\n");
 			break;
 		default:

@@ -1,11 +1,15 @@
 #include "UI.h"
 #include "dynamicArray.h"
+#include "repo.h"
 #include <crtdbg.h>
 #include <stdlib.h>
 
 int main()
 {
 	testsDynamicArray();
+	testsMedicine();
+	testsRepo();
+	testsService();
 	Repo* repo = repoCreate();
 	Service* serv = servCreate(repo);
 
@@ -19,6 +23,8 @@ int main()
 	servAddMed(serv, "Sedatif", 75, 56, 26);
 	servAddMed(serv, "Coldrex", 120, 33, 34);
 	servAddMed(serv, "Nurofen", 150, 64, 30);
+
+	//malloc(10);
 
 	UI* ui = createUI(serv);
 	startUI(ui);
