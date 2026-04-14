@@ -1,181 +1,385 @@
-#include <ctype.h>
-#include <stdio.h>
+#include "ui.h"
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
-#include "repo.h"
 
-int main(int argc, char** argv)
+UI* createUI(Service* s)
 {
-	printf("Hi, John! Here is your Smiles Pharmacy stock =)!\n");
-	char o;
-	char name[100], word[100];
-	int con, qty, p;
-	repo *pharmacy = repoInit();
+	UI* ui = malloc(sizeof(UI));
+	if (ui == NULL)
+		return NULL;
+	ui->serv = s;
+	return ui;
+}
 
-	while (1)
+void destroyUI(UI* ui)
+{
+	servDestroy(ui->serv);
+	free(ui);
+}
+
+void printMenu()
+{
+	printf("\nPlease choose an option:\n");
+	printf("1. Add a medicine.\n");
+	printf("2. Delete a medicine.\n");
+	printf("3. Update a medicine.\n");
+	printf("4. Search for a medicine by full name.\n");
+	printf("5. See medicines less than a quantity (+bonus c).\n");
+	printf("6. Undo.\n");
+	printf("7. Redo.\n");
+	printf("8. Search for a medicine by partial name (extra).\n");
+	printf("9. Search for a medicine by price (bonus b).\n");
+	printf("10. Search for a medicine by partial name, sorted descending by concentration (extra).\n");
+	printf("11. Print the data base.\n");
+	printf("12. Exit.\n");
+}
+
+//1
+void uiAddMedicine(UI* ui)
+{
+	char name[50];
+	int conc, qty, price;
+
+	printf("You chose to add a medicine. You have to type: \n");
+	printf("name: ");
+	scanf_s(" %[^\n]", name, (unsigned)_countof(name));
+	printf("concentration: ");
+	scanf_s("%d", &conc);
+	printf("quantity: ");
+	scanf_s("%d", &qty);
+	printf("price: ");
+	scanf_s("%d", &price);
+
+	int res = servAddMed(ui->serv, name, conc, qty, price);
+	if (res < 0)
+		printf("\nSomething went wrong. Try again.");
+	else
 	{
-		printf("\nPlease choose an option:\n");
-		printf("1. Add a medicine.\n");
-		printf("2. Delete a medicine.\n");
-		printf("3. Update a medicine.\n");
-		printf("4. Search for a medicine.\n");
-		printf("5. See medicines less than a quantity.\n");
-		printf("6. Undo.\n");
-		printf("7. Redo.\n");
-		printf("8. Extra requirement.\n");
-		printf("9. Exit.\n");
-		printf("Your option is:");
+		printf("\nMedicine added successfully! Look there:\n");
+		listAllMed(ui);
+	}
+}
 
-		scanf_s(" %c", &o);
-		while (getchar() != '\n');
+//2
+void uiDeleteMedicine(UI* ui)
+{
+	char name[50];
+	int conc;
 
-		printf("\n");
+	printf("You chose to delete a medicine. You have to type: \n");
+	printf("name: \n");
+	scanf_s(" %[^\n]", name, (unsigned)_countof(name));
+	printf("concentration: ");
+	scanf_s("%d", &conc);
 
-		if(!isdigit(o))
-			printf("Wrong input, Johnny. Try again with a number between 1-8.\n");
+	printf("\nThis WAS your data base:\n");
+	listAllMed(ui);
 
-		else if (o < '1' || o > '9')
-			printf("Wrong input, Johnny. Try again with a number between 1-8.\n");
+	int res = servDeleteMed(ui->serv, name, conc);
 
-		//Add a medicine
-		else if (o == '1')
+	if (res < 0)
+		printf("\nSomething went wrong. Try again.");
+	else
+	{
+		printf("\nMedicine deleted successfully! Look there at the NEW data base:\n");
+		listAllMed(ui);
+	}
+}
+
+//3
+void uiUpdateMedicine(UI* ui)
+{
+	char name[50];
+	int conc, newPrice;
+
+	printf("You chose to update a medicine. You have to type: \n");
+	printf("name: \n");
+	scanf_s(" %[^\n]", name, (unsigned)_countof(name));
+	printf("concentration: ");
+	scanf_s("%d", &conc);
+	printf("new price: ");
+	scanf_s("%d", &newPrice);
+
+	printf("\nThis WAS your data base:\n");
+	listAllMed(ui);
+
+	int res = servUpdateMed(ui->serv, name, conc, newPrice);
+
+	if (res < 0)
+		printf("\nSomething went wrong. Try again.");
+	else
+	{
+		printf("\nMedicine updated successfully! Look there at the NEW data base:\n");
+		listAllMed(ui);
+	}
+}
+
+//4
+void uiSearchFullName(UI* ui)
+{
+	char name[50];
+
+	printf("You chose to search a medicine by full name. You have to type: \n");
+	printf("name: \n");
+	fgets(name, sizeof(name), stdin);
+	name[strcspn(name, "\n")] = 0;
+
+	DynamicArray *res = servFullNameSearch(ui->serv, name);
+
+	if (getLength(res) == 0)
+	{
+		printf("\nNo medicine found! Look there at the entire data base:\n");
+		listAllMed(ui);
+		destroy(res);
+		return;
+	}
+
+	for (int i = 0; i < getLength(res); i++)
+	{
+		Medicine* m = (Medicine*)get(res, i);
+		char buffer[200];
+		toString(m, buffer, 200);
+		printf("%s\n", buffer);
+	}
+
+	destroy(res);
+}
+
+//5
+void uiInShortSearch(UI* ui)
+{
+	int givenQty, sort;
+
+	printf("You chose to see all medicines in short supply. Which sorting do you want?\n");
+	printf("1. ascending sorting\n");
+	printf("2. descending sorting\n");
+	printf("Your option:");
+	scanf_s("%d", &sort);
+
+	printf("Now you have to type : \n");
+	printf("quantity: ");
+	scanf_s("%d", &givenQty);
+
+	DynamicArray* res;
+
+	if (sort == 1)
+	{
+		res = servInShortQty(ui->serv, givenQty, cmpAscQty);
+	}
+	else
+	{
+		res = servInShortQty(ui->serv, givenQty, cmpDescQty);
+	}
+
+	if (getLength(res) == 0)
+	{
+		printf("\nNo medicine found! Look there at the entire data base:\n");
+		listAllMed(ui);
+		destroy(res);
+		return;
+	}
+
+	printf("\nMedicines with quantity < %d: \n", givenQty);
+
+	for (int i = 0; i < getLength(res); i++)
+	{
+		Medicine* m = (Medicine*)get(res, i);
+		char buffer[200];
+		toString(m, buffer, 200);
+		printf("%s\n", buffer);
+	}
+
+	destroy(res);
+}
+
+//6
+void uiUndo(UI* ui)
+{
+	printf("\nThis WAS your data base:\n");
+	listAllMed(ui);
+	if (servUndo(ui->serv))
+	{
+		printf("Undo successful.\n");
+		printf("Look there at the entire data base:\n");
+		listAllMed(ui);
+	}
+	else
+		printf("Nothing to undo.\n");
+}
+
+//7
+void uiRedo(UI* ui)
+{
+	printf("\nThis WAS your data base:\n");
+	listAllMed(ui);
+	if (servRedo(ui->serv))
+	{
+		printf("Redo successful.\n");
+		printf("Look there at the entire data base:\n");
+		listAllMed(ui);
+	}
+	else
+		printf("Nothing to redo.\n");
+}
+
+//8
+void uiSearchPartialName(UI* ui)
+{
+	char name[50];
+
+	printf("You chose to search a medicine by partial name. You have to type: \n");
+	printf("name: \n");
+	scanf_s(" %[^\n]", name, (unsigned)_countof(name));
+
+	DynamicArray* res = servPartialNameSearch(ui->serv, name);
+
+	if (getLength(res) == 0)
+	{
+		printf("\nNo medicine found! Look there at the entire data base:\n");
+		listAllMed(ui);
+		destroy(res);
+		return;
+	}
+
+	for (int i = 0; i < getLength(res); i++)
+	{
+		Medicine* m = (Medicine*)get(res, i);
+		char buffer[200];
+		toString(m, buffer, 200);
+		printf("%s\n", buffer);
+	}
+
+	destroy(res);
+}
+
+//9
+void uiSearchByPrice(UI* ui)
+{
+	int price;
+
+	printf("You chose to search a medicine by price. You have to type: \n");
+	printf("price: ");
+	scanf_s("%d", &price);
+
+	DynamicArray* res = servSearchByPrice(ui->serv, price, cmpAscConc);
+
+	if (getLength(res) == 0)
+	{
+		printf("\nNo medicine found! Look there at the entire data base:\n");
+		listAllMed(ui);
+		destroy(res);
+		return;
+	}
+
+	for (int i = 0; i < getLength(res); i++)
+	{
+		Medicine* m = (Medicine*)get(res, i);
+		char buffer[200];
+		toString(m, buffer, 200);
+		printf("%s\n", buffer);
+	}
+
+	destroy(res);
+}
+
+//10
+void uiSearchPartialNameSortConc(UI* ui)
+{
+	char name[50];
+
+	printf("You chose to search a medicine by partial name. You have to type: \n");
+	printf("name: \n");
+
+	fgets(name, sizeof(name), stdin);
+	name[strcspn(name, "\n")] = 0;
+
+	DynamicArray* res = servPartialNameSearchSortConc(ui->serv, name);
+
+	if (getLength(res) == 0)
+	{
+		printf("\nNo medicine found! Look there at the entire data base:\n");
+		listAllMed(ui);
+		destroy(res);
+		return;
+	}
+
+	for (int i = 0; i < getLength(res); i++)
+	{
+		Medicine* m = (Medicine*)get(res, i);
+		char buffer[200];
+		toString(m, buffer, 200);
+		printf("%s\n", buffer);
+	}
+
+	destroy(res);
+}
+
+void listAllMed(UI* ui)
+{
+	int len = repoGetLength(ui->serv->repo);
+	for (int i = 0; i < len; i++)
+	{
+		Medicine* m = repoFindMedAtPos(ui->serv->repo, i);
+		char str[200];
+		toString(m, str, 200);
+		printf("%s\n", str);
+	}
+}
+
+void startUI(UI *ui)
+{
+	int cmd = -1;
+	printf("Hi, John! Here is your Smiles Pharmacy stock =)!\n");
+	while (cmd != 12)
+	{
+		printMenu();
+		printf("Your option:");
+		scanf_s("%d", &cmd);
+
+		int c;
+		while ((c = getchar()) != '\n' && c != EOF) {}
+
+		switch (cmd)
 		{
-			printf("You chose to add a medicine. You have to type \n");
-			printf("<name>\n<concentration> <quantity> <price>\n");
-			scanf_s(" %99[^\n]", name, 100);
-			scanf_s(" %d %d %d", &con, &qty, &p);
-
-			medicine* m = addMedicine(name, con, qty, p);
-			addMedicineToRepo(pharmacy, m);
-			printf("Added successfully! \nLook there:\n");
-			printMedicines(pharmacy);
-		}
-
-		//Delete a medicine
-		else if (o == '2')
-		{
-			printf("You chose to delete a medicine. You have to type \n<name> <concentration>\n");
-			scanf_s(" %99[^\n]", name, 100);
-			scanf_s(" %d", &con);
-
-			printf("\nThis WAS your data:\n");
-			printMedicines(pharmacy);
-
-			deleteMedicineFromRepo(pharmacy, name, con);
-
-			printf("\nNOW! This IS your data:\n");
-			printMedicines(pharmacy);						
-		}
-
-		//Update a medicine
-		else if (o == '3')
-		{
-			printf("You chose to update a medicine. You have to type \n");
-			printf("<name>\n<concentration> <new price>\n");
-			scanf_s(" %99[^\n]", name, 100);
-			scanf_s(" %d %d", &con, &p);
-
-			printf("\nThis WAS your data:\n");
-			printMedicines(pharmacy);
-
-			updateMedicineFromRepo(pharmacy, name, con, p);
-
-			printf("Updated successfully! \nLook there:\n");
-			printMedicines(pharmacy);
-		}
-
-		//Search for a medicine
-		else if (o == '4')
-		{
-			printf("You chose to search for a medicine. You have to type \n<word>\n");
-			int read = scanf_s("%99[^\n]", word, 100);
-			while (getchar() != '\n');
-
-			repo* result;
-
-			if (read != 1)
-				result = pharmacy;
-			else
-				result = searchForMedicinePartialName(pharmacy, word);
-
-			if (result->count == 0)
-			{
-				printf("There is no medicine containing this name. \nThis is your data base:\n");
-				printMedicines(pharmacy);
-			}
-			else
-			{
-				medicine* temp;
-				for (int i = 0; i < result->count - 1; i++)
-					for (int j = i + 1; j < result->count; j++)
-						if (strcmp(result->items[i]->name, result->items[j]->name) > 0)
-						{
-							temp = result->items[i];
-							result->items[i] = result->items[j];
-							result->items[j] = temp;
-						}
-				printMedicines(result);
-			}
-			free(result);
-		}
-
-		//See medicines less than a quantity
-		else if (o == '5')
-		{
-		}
-
-		//Undo
-		else if (o == '6')
-		{
-		}
-
-		//Redo
-		else if (o == '7')
-		{
-		}
-
-		//For a given medication name, see all medications, sorted descending by price.
-		else if (o == '8')
-		{
-			printf("You chose to see all specified medicines sorted descending by price. \nYou have to type \n<name>\n");
-			int read = scanf_s("%99[^\n]", word, 100);
-			while (getchar() != '\n');
-
-			repo* result;
-
-			if (read != 1)
-				result = pharmacy;
-			else
-				result = searchForMedicineFullName(pharmacy, word);
-
-			if (result->count == 0)
-			{
-				printf("There is no medicine containing this name. \nThis is your data base:\n");
-				printMedicines(pharmacy);
-			}
-			else
-			{
-				medicine* temp;
-				for (int i = 0; i < result->count - 1; i++)
-					for (int j = i + 1; j < result->count; j++)
-						if (result->items[i]->price < result->items[j]->price)
-						{
-							temp = result->items[i];
-							result->items[i] = result->items[j];
-							result->items[j] = temp;
-						}
-				printMedicines(result);
-			}
-			free(result);
-		}
-
-		//Exit
-		else if (o == '9')
-		{
-			printf("Goodbye!\n");
-			destroyRepo(pharmacy);
-			return 0;
+		case 1:
+			uiAddMedicine(ui);
+			break;
+		case 2:
+			uiDeleteMedicine(ui);
+			break;
+		case 3:
+			uiUpdateMedicine(ui);
+			break;
+		case 4:
+			uiSearchFullName(ui);
+			break;
+		case 5:
+			uiInShortSearch(ui);
+			break;
+		case 6:
+			uiUndo(ui);
+			break;
+		case 7:
+			uiRedo(ui);
+			break;
+		case 8:
+			uiSearchPartialName(ui);
+			break;
+		case 9:
+			uiSearchByPrice(ui);
+			break;
+		case 10:
+			uiSearchPartialNameSortConc(ui);
+			break;
+		case 11:
+			listAllMed(ui);
+			break;
+		case 12:
+			printf("\nGoodbye, Johnny!\n");
+			break;
+		default:
+			printf("\nWrong input, Johnny. Try again with a number between 1-8.\n");
 		}
 	}
-	return 0;
 }
