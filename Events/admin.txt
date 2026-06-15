@@ -1,0 +1,63 @@
+Meeting
+All hands meeting
+2 4 2026
+10 40
+150
+https://meet.ro/
+0
+Careers
+Careers for teens
+14 6 2026
+11 20
+100
+https://careers.ro/
+0
+Green Party
+Party for students
+10 3 2026
+15 30
+306
+https://greenparty.ro/
+0
+Music Festival
+Cluj Napoca
+1 3 2026
+19 30
+30
+https://music.ro/
+0
+Cooking show
+Competition
+29 5 2026
+8 40
+5
+https://cookingshow.ro/
+0
+IT
+IT speakers
+20 3 2026
+10 10
+246
+https://it.ro/
+0
+Girls' night
+Party with friends
+22 5 2026
+22 30
+10
+https://gnight.ro/
+0
+Boys' night
+Party with friends
+12 4 2026
+22 30
+17
+https://bnight.ro/
+0
+gfhj
+fhj
+1 1 2026
+0 0
+6
+hj
+0
