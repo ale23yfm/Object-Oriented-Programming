@@ -1,0 +1,11 @@
+6;7;Running;85;cardio
+10;11;HIIT;95;high intensity
+7;8;Weight Lifting;90;strength training
+9;10;Cycling;80;cardio
+8;9;Yoga;50;flexibility
+7;8;Weight Lifting;90;strength training
+2;10;Cycling;80;cardio
+4;9;Yoga;50;flexibility
+
+
+

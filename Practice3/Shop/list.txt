@@ -1,0 +1,8 @@
+Drinks|Orange juice|2
+Drinks|Water|6
+Frui|Lime|1
+Dairy|Yoghurt|4
+Dairy|Milk|1
+Sweets|Chocolate|3
+Veg|Carrot|3
+Fruit|Lemon|2
