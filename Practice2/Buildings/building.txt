@@ -1,0 +1,4 @@
+Address: address | constructionYear: 1987 | Type:type | isHistorical: YES
+Address: address | constructionYear: 2000 | Type:type | isHistorical: NO
+Address: address | constructionYear: 2023 | totalApartments: 45 | occupiedApartments: 12
+Address: address | constructionYear: 1986 | totalApartments: 30 | occupiedApartments: 10

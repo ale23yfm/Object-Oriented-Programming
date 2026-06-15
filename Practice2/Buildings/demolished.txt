@@ -1,0 +1,2 @@
+Address: address | constructionYear: 2000 | Type:type | isHistorical: NO | mustBeRestored: NO | canBeDemolished: YES
+Address: address | constructionYear: 1986 | totalApartments: 1000 | occupiedApartments: 0 | mustBeRestored: NO | canBeDemolished: YES

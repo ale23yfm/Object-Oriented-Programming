@@ -1,0 +1,1 @@
+Address: address | constructionYear: 1723 | totalApartments: 45 | occupiedApartments: 12 | mustBeRestored: YES | canBeDemolished: NO

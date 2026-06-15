@@ -1,0 +1,3 @@
+Refrigerator | id: 2 | electricityUsageClass: A++ | hasFreezer:NO | consumedElectricity: 60.000000 KW
+Refrigerator | id: 3 | electricityUsageClass: A++ | hasFreezer:YES | consumedElectricity: 80.000000 KW
+Refrigerator | id: 4 | electricityUsageClass: A | hasFreezer:NO | consumedElectricity: 90.000000 KW

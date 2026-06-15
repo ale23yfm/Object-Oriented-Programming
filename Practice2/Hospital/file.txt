@@ -1,0 +1,4 @@
+Surgery at : hospitalName | numberOfDoctors: 2 | numberOfPatients: 12 | efficiency: YES
+Neonatal at : hospitalName | numberOfDoctors: 2 | numberOfNewBorns: 3 | numberOfMothers: 12 | averageGrade: 6.000000 | efficiency: NO
+Neonatal at : hospitalName | numberOfDoctors: 2 | numberOfNewBorns: 13 | numberOfMothers: 12 | averageGrade: 6.000000 | efficiency: NO
+Neonatal at : hospitalName | numberOfDoctors: 9 | numberOfNewBorns: 13 | numberOfMothers: 12 | averageGrade: 9.000000 | efficiency: YES

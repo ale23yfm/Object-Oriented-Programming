@@ -1,0 +1,3 @@
+BP | data: 2026.04.22 | systolicValue: 91 | diastolicValue: 58 | IS NOT OK
+BP | data: 2026.03.22 | systolicValue: 91 | diastolicValue: 70 | IS OK
+BP | data: 2026.03.02 | systolicValue: 81 | diastolicValue: 70 | IS NOT OK

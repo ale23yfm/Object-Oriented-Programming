@@ -1,0 +1,1 @@
+truck | licensePlate: licensePlate2 | yearOfManufacture1982 | loadCapacity: 3000.000000 | cargoType: cargoType1
