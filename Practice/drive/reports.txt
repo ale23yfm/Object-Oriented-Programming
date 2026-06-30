@@ -1,0 +1,3 @@
+accident,Alex,12.5,7.9,0
+traffic,Mircea,14.8,4.1,1
+radar,Ion,3.0,9.0,0

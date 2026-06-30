@@ -1,0 +1,3 @@
+Ale|12|15|true
+Andrei|30|25|true
+Delu|21|17|false
