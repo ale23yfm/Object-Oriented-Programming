@@ -1,0 +1,2 @@
+EcoliA|E.coli|5|fever,diarrhea
+SalmB|Salmonella|3|vomiting,fever
